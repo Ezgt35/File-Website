@@ -276,10 +276,5 @@ app.get("/upload", (req, res) => {
   res.sendFile(path.join(__dirname, "upload.html"));
 });
 
-// Start server
-app.listen(PORT, HOST, () => {
-    console.log(`Server berjalan di port ${PORT}`);
-    console.log(`Host: ${HOST}`);
-    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`Akses aplikasi di: http://${HOST}:${PORT}`);
-});
+// ✅ Export app untuk Vercel
+module.exports = app;
