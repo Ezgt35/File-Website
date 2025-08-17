@@ -8,6 +8,8 @@ const app = express();
 const PORT = process.env.PORT || process.env.NODE_PORT || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 
+<link rel="stylesheet" href="style.css">
+    
 // Create necessary directories
 const uploadDir = process.env.UPLOAD_DIR || path.join(__dirname, 'uploads');
 const categorizedDirs = {
