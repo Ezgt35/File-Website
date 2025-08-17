@@ -255,9 +255,4 @@ app.use((error, req, res, next) => {
 });
 
 // Start server
-app.listen(PORT, HOST, () => {
-    console.log(`Server berjalan di port ${PORT}`);
-    console.log(`Host: ${HOST}`);
-    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`Akses aplikasi di: http://${HOST}:${PORT}`);
-});
+module.exports = app;
