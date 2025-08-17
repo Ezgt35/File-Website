@@ -5,11 +5,14 @@ const path = require('path');
 const fs = require('fs-extra');
 
 const app = express();
-const PORT = process.env.PORT || process.env.NODE_PORT || 3000;
-const HOST = process.env.HOST || '0.0.0.0';
 
+// ✅ di Vercel ga perlu PORT & HOST
+// const PORT = process.env.PORT || process.env.NODE_PORT || 3000;
+// const HOST = process.env.HOST || '0.0.0.0';
+
+// ✅ serve static file (html, css, js)
 app.use(express.static(path.join(__dirname)));
-    
+
 // Create necessary directories
 const uploadDir = process.env.UPLOAD_DIR || path.join(__dirname, 'uploads');
 const categorizedDirs = {
@@ -21,6 +24,10 @@ const categorizedDirs = {
     'Script': path.join(uploadDir, 'scripts'),
     'Other': path.join(uploadDir, 'other')
 };
+
+// 📌 terakhir JANGAN pakai app.listen
+// ✅ cukup export app ke Vercel
+module.exports = app;
 
 // Ensure directories exist
 fs.ensureDirSync(uploadDir);
