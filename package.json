@@ -10,9 +10,10 @@
   },
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
     "build": "echo 'No build step required for this Node.js application'",
     "postinstall": "node -e \"console.log('Installation complete')\""
+  },
   "dependencies": {
     "express": "^4.18.2",
     "express-session": "^1.17.3",
