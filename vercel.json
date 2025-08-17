@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "download-manager-pro",
   "builds": [
     {
       "src": "server.js",
@@ -10,10 +9,7 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/server.js"
+      "dest": "server.js"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
