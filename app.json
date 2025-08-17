@@ -1,0 +1,34 @@
+{
+  "name": "Download Manager Pro",
+  "description": "Professional download manager with file categorization and admin panel",
+  "repository": "https://github.com/your-username/download-manager",
+  "logo": "https://via.placeholder.com/120x120.png?text=DM",
+  "keywords": ["node", "express", "download", "manager", "file-upload"],
+  "image": "heroku/nodejs",
+  "stack": "heroku-22",
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "addons": [],
+  "env": {
+    "NODE_ENV": {
+      "description": "Node environment",
+      "value": "production"
+    },
+    "SESSION_SECRET": {
+      "description": "Secret key for session management",
+      "generator": "secret"
+    }
+  },
+  "scripts": {
+    "postdeploy": "echo 'Deployment completed successfully'"
+  }
+}
