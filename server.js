@@ -25,9 +25,6 @@ const categorizedDirs = {
     'Other': path.join(uploadDir, 'other')
 };
 
-// 📌 terakhir JANGAN pakai app.listen
-// ✅ cukup export app ke Vercel
-module.exports = app;
 
 // Ensure directories exist
 fs.ensureDirSync(uploadDir);
@@ -38,7 +35,7 @@ Object.values(categorizedDirs).forEach(dir => {
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static('.'));
+
 
 // Session configuration
 app.use(session({
