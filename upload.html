@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload - Download Manager Pro</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">Download Manager Pro</a>
+            <ul class="nav-menu">
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/upload.html" class="nav-link">Upload</a></li>
+                <li><a href="#" onclick="logout()" class="nav-link">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="form-container" style="max-width: 700px;">
+            <h2 class="form-title">Upload File</h2>
+            
+            <div id="alert-container"></div>
+            
+            <form id="upload-form" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label class="form-label">Pilih File</label>
+                    <div class="upload-area" id="upload-area">
+                        <div class="upload-icon">📁</div>
+                        <p class="upload-text">Klik atau drag & drop file ke sini</p>
+                        <input type="file" id="file" name="file" class="upload-input" required>
+                    </div>
+                    <p id="selected-file" style="margin-top: 1rem; color: #64748b; font-size: 0.9rem;"></p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="filename" class="form-label">Nama File</label>
+                    <input type="text" id="filename" name="filename" class="form-input" required placeholder="Masukkan nama file">
+                </div>
+                
+                <div class="form-group">
+                    <label for="description" class="form-label">Deskripsi</label>
+                    <textarea id="description" name="description" class="form-textarea" placeholder="Masukkan deskripsi file"></textarea>
+                </div>
+                
+                <button type="submit" class="btn-primary">
+                    <span id="upload-text">Upload File</span>
+                    <span id="upload-loading" class="loading" style="display: none;"></span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 Download Manager Pro. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Check authentication on page load
+        fetch('/auth-status')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.isAuthenticated) {
+                    window.location.href = '/login.html';
+                }
+            });
+
+        // Logout function
+        function logout() {
+            fetch('/logout', { method: 'POST' })
+                .then(() => {
+                    window.location.href = '/';
+                });
+        }
+
+        // File upload handling
+        const uploadArea = document.getElementById('upload-area');
+        const fileInput = document.getElementById('file');
+        const selectedFileText = document.getElementById('selected-file');
+        const filenameInput = document.getElementById('filename');
+
+        // Click to select file
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // Drag and drop handlers
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                handleFileSelection(files[0]);
+            }
+        });
+
+        // File selection handler
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelection(e.target.files[0]);
+            }
+        });
+
+        function handleFileSelection(file) {
+            selectedFileText.textContent = `File dipilih: ${file.name} (${formatFileSize(file.size)})`;
+            
+            // Auto-fill filename if empty
+            if (!filenameInput.value) {
+                filenameInput.value = file.name;
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Form submission
+        document.getElementById('upload-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const uploadText = document.getElementById('upload-text');
+            const uploadLoading = document.getElementById('upload-loading');
+            const alertContainer = document.getElementById('alert-container');
+            
+            // Show loading
+            uploadText.style.display = 'none';
+            uploadLoading.style.display = 'inline-block';
+            
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            formData.append('filename', document.getElementById('filename').value);
+            formData.append('description', document.getElementById('description').value);
+            
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide loading
+                uploadText.style.display = 'inline';
+                uploadLoading.style.display = 'none';
+                
+                if (data.success) {
+                    alertContainer.innerHTML = '<div class="alert alert-success">File berhasil diupload!</div>';
+                    document.getElementById('upload-form').reset();
+                    selectedFileText.textContent = '';
+                } else {
+                    alertContainer.innerHTML = '<div class="alert alert-error">' + data.message + '</div>';
+                }
+            })
+            .catch(error => {
+                // Hide loading
+                uploadText.style.display = 'inline';
+                uploadLoading.style.display = 'none';
+                
+                alertContainer.innerHTML = '<div class="alert alert-error">Terjadi kesalahan saat upload.</div>';
+            });
+        });
+    </script>
+</body>
+</html>

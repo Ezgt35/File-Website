@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Download Manager Pro</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">Download Manager Pro</a>
+            <ul class="nav-menu">
+                <li><a href="/" class="nav-link">Home</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="form-container">
+            <h2 class="form-title">Login Admin</h2>
+            
+            <div id="alert-container"></div>
+            
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" id="username" name="username" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" id="password" name="password" class="form-input" required>
+                </div>
+                
+                <button type="submit" class="btn-primary">
+                    <span id="login-text">Login</span>
+                    <span id="login-loading" class="loading" style="display: none;"></span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 Download Manager Pro. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const loginText = document.getElementById('login-text');
+            const loginLoading = document.getElementById('login-loading');
+            const alertContainer = document.getElementById('alert-container');
+            
+            // Show loading
+            loginText.style.display = 'none';
+            loginLoading.style.display = 'inline-block';
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide loading
+                loginText.style.display = 'inline';
+                loginLoading.style.display = 'none';
+                
+                if (data.success) {
+                    alertContainer.innerHTML = '<div class="alert alert-success">Login berhasil! Mengalihkan...</div>';
+                    setTimeout(() => {
+                        window.location.href = '/upload.html';
+                    }, 1500);
+                } else {
+                    alertContainer.innerHTML = '<div class="alert alert-error">' + data.message + '</div>';
+                }
+            })
+            .catch(error => {
+                // Hide loading
+                loginText.style.display = 'inline';
+                loginLoading.style.display = 'none';
+                
+                alertContainer.innerHTML = '<div class="alert alert-error">Terjadi kesalahan saat login.</div>';
+            });
+        });
+    </script>
+</body>
+</html>

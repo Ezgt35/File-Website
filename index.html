@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Manager Pro</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">Download Manager Pro</a>
+            <ul class="nav-menu">
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li id="upload-menu" style="display: none;"><a href="/upload.html" class="nav-link">Upload</a></li>
+                <li id="login-menu"><a href="/login.html" class="nav-link">Login</a></li>
+                <li id="logout-menu" style="display: none;"><a href="#" onclick="logout()" class="nav-link">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="hero">
+            <h1>Download Manager Professional</h1>
+            <p>Kelola dan unduh file dengan mudah. Sistem download manager modern dengan kategorisasi otomatis dan antarmuka yang intuitif.</p>
+        </div>
+
+        <div id="files-container">
+            <!-- Files will be loaded here -->
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 Download Manager Pro. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Check if user is logged in
+        function checkAuth() {
+            fetch('/auth-status')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.isAuthenticated) {
+                        document.getElementById('upload-menu').style.display = 'block';
+                        document.getElementById('login-menu').style.display = 'none';
+                        document.getElementById('logout-menu').style.display = 'block';
+                    }
+                });
+        }
+
+        // Logout function
+        function logout() {
+            fetch('/logout', { method: 'POST' })
+                .then(() => {
+                    window.location.reload();
+                });
+        }
+
+        // Get file icon based on category
+        function getFileIcon(category) {
+            const icons = {
+                'Music': '🎵',
+                'Video': '🎬',
+                'Document': '📄',
+                'Image': '🖼️',
+                'Archive': '📦',
+                'Script': '💻',
+                'Other': '📁'
+            };
+            return icons[category] || icons['Other'];
+        }
+
+        // Load files from server
+        function loadFiles() {
+            fetch('/files')
+                .then(response => response.json())
+                .then(files => {
+                    displayFiles(files);
+                })
+                .catch(error => {
+                    console.error('Error loading files:', error);
+                    document.getElementById('files-container').innerHTML = 
+                        '<p style="text-align: center; color: #64748b;">Tidak ada file yang tersedia saat ini.</p>';
+                });
+        }
+
+        // Display files grouped by category
+        function displayFiles(files) {
+            const container = document.getElementById('files-container');
+            
+            if (files.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #64748b;">Tidak ada file yang tersedia saat ini.</p>';
+                return;
+            }
+
+            // Group files by category
+            const groupedFiles = files.reduce((groups, file) => {
+                const category = file.category || 'Other';
+                if (!groups[category]) {
+                    groups[category] = [];
+                }
+                groups[category].push(file);
+                return groups;
+            }, {});
+
+            // Generate HTML for each category
+            let html = '';
+            for (const [category, categoryFiles] of Object.entries(groupedFiles)) {
+                html += `
+                    <div class="category-section">
+                        <h2 class="category-title">${getFileIcon(category)} ${category}</h2>
+                        <div class="files-grid">
+                `;
+                
+                categoryFiles.forEach(file => {
+                    html += `
+                        <div class="file-card">
+                            <span class="file-icon">${getFileIcon(file.category)}</span>
+                            <h3 class="file-name">${file.name}</h3>
+                            <p class="file-description">${file.description || 'Tidak ada deskripsi'}</p>
+                            <a href="/download/${file.id}" class="download-btn">Download</a>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadFiles();
+        });
+    </script>
+</body>
+</html>
