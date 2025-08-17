@@ -254,6 +254,19 @@ app.use((error, req, res, next) => {
     res.status(500).json({ success: false, message: 'Terjadi kesalahan server' });
 });
 
+// ✅ Tambahin ini
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
+app.get("/login", (req, res) => {
+  res.sendFile(path.join(__dirname, "login.html"));
+});
+
+app.get("/upload", (req, res) => {
+  res.sendFile(path.join(__dirname, "upload.html"));
+});
+
 // Start server
 app.listen(PORT, HOST, () => {
     console.log(`Server berjalan di port ${PORT}`);
